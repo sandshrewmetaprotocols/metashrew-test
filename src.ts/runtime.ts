@@ -27,7 +27,7 @@ export const toU32LEBytes = (n) => {
   const ary = new Uint32Array(1);
   ary[0] = n;
   const byteArray = new Uint8Array(ary.buffer);
-  return Buffer.from(Array.from(byteArray).reverse());
+  return Buffer.from(Array.from(byteArray));
 };
 
 export const readArrayBuffer = (memory: WebAssembly.Memory, ptr: number) => {
