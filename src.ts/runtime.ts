@@ -84,7 +84,7 @@ export class IndexerProgram extends EventEmitter {
   }
   __get(k: number, v: number): void {
     const key = readArrayBufferAsHex(this.memory, k);
-    const value = this.kv[key];
+    const value = this.kv[key] || '0x';
     this.emit("get", [key, value]);
     const view = new Uint8Array(this.memory.buffer);
     const valueData = Buffer.from(stripHexPrefix(value), "hex");
