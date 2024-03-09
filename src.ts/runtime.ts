@@ -70,7 +70,7 @@ export class IndexerProgram extends EventEmitter {
     }
   }
   __host_len(): number {
-    return stripHexPrefix(this.block).length / 2;
+    return 4 + stripHexPrefix(this.block).length / 2;
   }
   __flush(v: number): void {
     const list = rlp.decode(readArrayBufferAsHex(this.memory, v));
