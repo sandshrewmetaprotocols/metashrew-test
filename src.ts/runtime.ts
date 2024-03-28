@@ -48,7 +48,7 @@ export class IndexerProgram extends EventEmitter {
   constructor(program: ArrayBuffer) {
     super();
     this.program = program;
-    this.kv = Object.create(null);
+    this.kv = {};
   }
   get memory() {
     return (this as any).instance.instance.exports.memory;
@@ -73,7 +73,8 @@ export class IndexerProgram extends EventEmitter {
     return 4 + stripHexPrefix(this.block).length / 2;
   }
   __flush(v: number): void {
-    const list = rlp.decode(readArrayBufferAsHex(this.memory, v));
+    const data = readArrayBufferAsHex(this.memory, v);
+    const list = rlp.decode(data);
     chunk(list, 2).forEach(([key, value]: any) => {
       this.kv[
         addHexPrefix(Buffer.from(Array.from(key) as number[]).toString("hex"))
