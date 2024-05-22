@@ -52,9 +52,7 @@ export class IndexPointer {
     return this.program.kv[this.key];
   }
   static for(program: any, key: string) {
-    const pointer = new IndexPointer(k);
-    pointer.program = program;
-    return pointer;
+    return new IndexPointer(program, '0x').keyword(key);
   }
   select(k: string) {
     return new IndexPointer(this.program, k + stripHexPrefix(k));

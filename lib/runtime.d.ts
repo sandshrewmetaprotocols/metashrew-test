@@ -5,6 +5,15 @@ export declare const readArrayBufferAsUtf8: (memory: WebAssembly.Memory, ptr: nu
 export declare const readArrayBufferAsHex: (memory: WebAssembly.Memory, ptr: number) => string;
 export declare const toU32LEBytes: (n: any) => Buffer;
 export declare const readArrayBuffer: (memory: WebAssembly.Memory, ptr: number) => ArrayBufferLike;
+export declare class IndexPointer {
+    key: string;
+    program: any;
+    constructor(program: any, key: string);
+    get(): string;
+    static for(program: any, key: string): IndexPointer;
+    select(k: string): IndexPointer;
+    keyword(k: string): IndexPointer;
+}
 export declare class IndexerProgram extends EventEmitter {
     block: string;
     program: ArrayBuffer;
