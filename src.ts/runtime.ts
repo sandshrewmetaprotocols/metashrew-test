@@ -55,10 +55,19 @@ export class IndexPointer {
     return new IndexPointer(program, '0x').keyword(key);
   }
   select(k: string) {
-    return new IndexPointer(this.program, k + stripHexPrefix(k));
+    return new IndexPointer(this.program, this.key + stripHexPrefix(k));
   }
   keyword(k: string) {
-    return this.select(Buffer.from(k).toString('utf8'));
+    return this.select(Buffer.from(k).toString('hex'));
+  }
+  getUInt64(): BigInt {
+    return BigInt('0x' + chunk([].slice.call(stripHexPrefix(this.get())), 2).map((v) => v.join('')).reverse().join(''));
+  }
+  getBST(): any {
+    return Object.entries(this.program.kv).filter(([k, v]) => k.substr(0, this.key.length) === this.key && k.substr(k.length - 10, 10) !== '2f6d61736b').reduce((r, [k, v]: any) => {
+      r[addHexPrefix(k.substr(2 + this.key.length))] = v;
+      return r;
+    }, {});
   }
 }
 

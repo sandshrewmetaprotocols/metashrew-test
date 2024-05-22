@@ -13,6 +13,8 @@ export declare class IndexPointer {
     static for(program: any, key: string): IndexPointer;
     select(k: string): IndexPointer;
     keyword(k: string): IndexPointer;
+    getUInt64(): BigInt;
+    getBST(): any;
 }
 export declare class IndexerProgram extends EventEmitter {
     block: string;
