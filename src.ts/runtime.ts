@@ -40,6 +40,30 @@ export const readArrayBuffer = (memory: WebAssembly.Memory, ptr: number) => {
 const stripHexPrefix = (s) => (s.substr(0, 2) === "0x" ? s.substr(2) : s);
 const addHexPrefix = (s) => (s.substr(0, 2) === "0x" ? s : "0x" + s);
 
+export class IndexPointer {
+  public key: string;
+  public program: any;
+  constructor(program: any, key: string) {
+    this.key = addHexPrefix(key);
+    this.program = program;
+
+  }
+  get(): string {
+    return this.program.kv[this.key];
+  }
+  static for(program: any, key: string) {
+    const pointer = new IndexPointer(k);
+    pointer.program = program;
+    return pointer;
+  }
+  select(k: string) {
+    return new IndexPointer(this.program, k + stripHexPrefix(k));
+  }
+  keyword(k: string) {
+    return this.select(Buffer.from(k).toString('utf8'));
+  }
+}
+
 export class IndexerProgram extends EventEmitter {
   public block: string;
   public program: ArrayBuffer;
