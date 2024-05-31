@@ -1,5 +1,5 @@
 import EventEmitter from "events";
-import rlp from "rlp";
+import { KeyValueFlush } from "./proto/metashrew";
 import chunk from "lodash/chunk";
 
 export const readArrayBufferAsUtf8 = (
@@ -39,6 +39,18 @@ export const readArrayBuffer = (memory: WebAssembly.Memory, ptr: number) => {
 
 const stripHexPrefix = (s) => (s.substr(0, 2) === "0x" ? s.substr(2) : s);
 const addHexPrefix = (s) => (s.substr(0, 2) === "0x" ? s : "0x" + s);
+
+export function toHex(v: Uint8Array): string {
+  return addHexPrefix(Buffer.from(Array.from(v)).toString('hex'));
+}
+
+export function fromHex(v: string): Uint8Array {
+  return new Uint8Array(Array.from(Buffer.from(stripHexPrefix(v), 'hex')));
+}
+
+export function fromKeyValueFlush(hex: string): string[] {
+  return KeyValueFlush.fromBinary(fromHex(hex)).list.map((v) => toHex(v));
+}
 
 export class IndexPointer {
   public key: string;
@@ -105,7 +117,7 @@ export class IndexerProgram extends EventEmitter {
   }
   __flush(v: number): void {
     const data = readArrayBufferAsHex(this.memory, v);
-    const list = rlp.decode(data);
+    const list = fromKeyValueFlush(data);
     chunk(list, 2).forEach(([key, value]: any) => {
       this.kv[
         addHexPrefix(Buffer.from(Array.from(key) as number[]).toString("hex"))

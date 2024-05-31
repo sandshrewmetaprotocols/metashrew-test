@@ -5,6 +5,9 @@ export declare const readArrayBufferAsUtf8: (memory: WebAssembly.Memory, ptr: nu
 export declare const readArrayBufferAsHex: (memory: WebAssembly.Memory, ptr: number) => string;
 export declare const toU32LEBytes: (n: any) => Buffer;
 export declare const readArrayBuffer: (memory: WebAssembly.Memory, ptr: number) => ArrayBufferLike;
+export declare function toHex(v: Uint8Array): string;
+export declare function fromHex(v: string): Uint8Array;
+export declare function fromKeyValueFlush(hex: string): string[];
 export declare class IndexPointer {
     key: string;
     program: any;
