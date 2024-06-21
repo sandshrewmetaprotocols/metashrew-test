@@ -108,7 +108,6 @@ export class IndexerProgram extends EventEmitter {
   __load_input(ptr: number): void {
     const view = new Uint8Array(this.memory.buffer);
     const block = Buffer.concat([  toU32LEBytes(this.blockHeight), Buffer.from(stripHexPrefix(this.block), "hex") ]);
-    console.log(block);
     for (let i = 0; i < block.length; i++) {
       view[i + ptr] = block.readUInt8(i);
     }
