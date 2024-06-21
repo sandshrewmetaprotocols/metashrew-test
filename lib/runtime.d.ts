@@ -1,5 +1,3 @@
-/// <reference types="node" />
-/// <reference types="node" />
 import EventEmitter from "events";
 export declare const readArrayBufferAsUtf8: (memory: WebAssembly.Memory, ptr: number) => string;
 export declare const readArrayBufferAsHex: (memory: WebAssembly.Memory, ptr: number) => string;

@@ -119,11 +119,7 @@ export class IndexerProgram extends EventEmitter {
     const data = readArrayBufferAsHex(this.memory, v);
     const list = fromKeyValueFlush(data);
     chunk(list, 2).forEach(([key, value]: any) => {
-      this.kv[
-        addHexPrefix(Buffer.from(Array.from(key) as number[]).toString("hex"))
-      ] = addHexPrefix(
-        Buffer.from(Array.from(value) as number[]).toString("hex"),
-      );
+      this.kv[key] = value;
     });
   }
   __get(k: number, v: number): void {
