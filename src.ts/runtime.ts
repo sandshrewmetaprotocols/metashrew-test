@@ -135,7 +135,7 @@ export class IndexerProgram extends EventEmitter {
   __get_len(k: number): number {
     const key = readArrayBufferAsHex(this.memory, k);
     if (!this.kv[key]) return 0;
-    return stripHexPrefix(key).length / 2;
+    return stripHexPrefix(this.kv[key]).length / 2;
   }
   abort() {
     this.emit("abort");
