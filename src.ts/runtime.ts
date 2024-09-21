@@ -4,21 +4,21 @@ import chunk from "lodash/chunk";
 
 export const readArrayBufferAsUtf8 = (
   memory: WebAssembly.Memory,
-  ptr: number,
+  ptr: number
 ) => {
   return Buffer.from(
-    Array.from(new Uint8Array(readArrayBuffer(memory, ptr))),
+    Array.from(new Uint8Array(readArrayBuffer(memory, ptr)))
   ).toString("utf8");
 };
 
 export const readArrayBufferAsHex = (
   memory: WebAssembly.Memory,
-  ptr: number,
+  ptr: number
 ) => {
   return (
     "0x" +
     Buffer.from(
-      Array.from(new Uint8Array(readArrayBuffer(memory, ptr))),
+      Array.from(new Uint8Array(readArrayBuffer(memory, ptr)))
     ).toString("hex")
   );
 };
@@ -41,11 +41,11 @@ const stripHexPrefix = (s) => (s.substr(0, 2) === "0x" ? s.substr(2) : s);
 const addHexPrefix = (s) => (s.substr(0, 2) === "0x" ? s : "0x" + s);
 
 export function toHex(v: Uint8Array): string {
-  return addHexPrefix(Buffer.from(Array.from(v)).toString('hex'));
+  return addHexPrefix(Buffer.from(Array.from(v)).toString("hex"));
 }
 
 export function fromHex(v: string): Uint8Array {
-  return new Uint8Array(Array.from(Buffer.from(stripHexPrefix(v), 'hex')));
+  return new Uint8Array(Array.from(Buffer.from(stripHexPrefix(v), "hex")));
 }
 
 export function fromKeyValueFlush(hex: string): string[] {
@@ -58,28 +58,39 @@ export class IndexPointer {
   constructor(program: any, key: string) {
     this.key = addHexPrefix(key);
     this.program = program;
-
   }
   get(): string {
     return this.program.kv[this.key];
   }
   static for(program: any, key: string) {
-    return new IndexPointer(program, '0x').keyword(key);
+    return new IndexPointer(program, "0x").keyword(key);
   }
   select(k: string) {
     return new IndexPointer(this.program, this.key + stripHexPrefix(k));
   }
   keyword(k: string) {
-    return this.select(Buffer.from(k).toString('hex'));
+    return this.select(Buffer.from(k).toString("hex"));
   }
   getUInt64(): BigInt {
-    return BigInt('0x' + chunk([].slice.call(stripHexPrefix(this.get())), 2).map((v) => v.join('')).reverse().join(''));
+    return BigInt(
+      "0x" +
+        chunk([].slice.call(stripHexPrefix(this.get())), 2)
+          .map((v) => v.join(""))
+          .reverse()
+          .join("")
+    );
   }
   getBST(): any {
-    return Object.entries(this.program.kv).filter(([k, v]) => k.substr(0, this.key.length) === this.key && k.substr(k.length - 10, 10) !== '2f6d61736b').reduce((r, [k, v]: any) => {
-      r[addHexPrefix(k.substr(2 + this.key.length))] = v;
-      return r;
-    }, {});
+    return Object.entries(this.program.kv)
+      .filter(
+        ([k, v]) =>
+          k.substr(0, this.key.length) === this.key &&
+          k.substr(k.length - 10, 10) !== "2f6d61736b"
+      )
+      .reduce((r, [k, v]: any) => {
+        r[addHexPrefix(k.substr(2 + this.key.length))] = v;
+        return r;
+      }, {});
   }
 }
 
@@ -102,12 +113,15 @@ export class IndexerProgram extends EventEmitter {
     const length = data.readUInt32LE(ptr - 4);
     this.emit(
       "log",
-      Buffer.from(ary.slice(ptr, ptr + length)).toString("utf8"),
+      Buffer.from(ary.slice(ptr, ptr + length)).toString("utf8")
     );
   }
   __load_input(ptr: number): void {
     const view = new Uint8Array(this.memory.buffer);
-    const block = Buffer.concat([  toU32LEBytes(this.blockHeight), Buffer.from(stripHexPrefix(this.block), "hex") ]);
+    const block = Buffer.concat([
+      toU32LEBytes(this.blockHeight),
+      Buffer.from(stripHexPrefix(this.block), "hex"),
+    ]);
     for (let i = 0; i < block.length; i++) {
       view[i + ptr] = block.readUInt8(i);
     }
@@ -124,7 +138,7 @@ export class IndexerProgram extends EventEmitter {
   }
   __get(k: number, v: number): void {
     const key = readArrayBufferAsHex(this.memory, k);
-    const value = this.kv[key] || '0x';
+    const value = this.kv[key] || "0x";
     this.emit("get", [key, value]);
     const view = new Uint8Array(this.memory.buffer);
     const valueData = Buffer.from(stripHexPrefix(value), "hex");
@@ -137,9 +151,13 @@ export class IndexerProgram extends EventEmitter {
     if (!this.kv[key]) return 0;
     return stripHexPrefix(this.kv[key]).length / 2;
   }
-  abort() {
-    this.emit("abort");
-    throw Error("abort!");
+  abort(ptr: number) {
+    const ary = Array.from(new Uint8Array(this.memory.buffer));
+    const data = Buffer.from(ary);
+    const length = data.readUInt32LE(ptr - 4);
+    const msg = Buffer.from(ary.slice(ptr, ptr + length)).toString("utf8");
+    this.emit(`abort: ${msg}`);
+    throw Error(`abort: ${msg}`);
   }
   setBlock(block: string): IndexerProgram {
     this.block = block;

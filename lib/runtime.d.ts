@@ -30,7 +30,7 @@ export declare class IndexerProgram extends EventEmitter {
     __flush(v: number): void;
     __get(k: number, v: number): void;
     __get_len(k: number): number;
-    abort(): void;
+    abort(ptr: number, ...args: any[]): void;
     setBlock(block: string): IndexerProgram;
     setBlockHeight(blockHeight: number): IndexerProgram;
     run(symbol: string): Promise<any>;
