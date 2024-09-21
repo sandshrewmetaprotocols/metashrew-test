@@ -107,14 +107,14 @@ export class IndexerProgram extends EventEmitter {
   get memory() {
     return (this as any).instance.instance.exports.memory;
   }
-  __log(ptr: number): void {
+  getStringFromPtr(ptr: number): string {
     const ary = Array.from(new Uint8Array(this.memory.buffer));
     const data = Buffer.from(ary);
     const length = data.readUInt32LE(ptr - 4);
-    this.emit(
-      "log",
-      Buffer.from(ary.slice(ptr, ptr + length)).toString("utf8")
-    );
+    return Buffer.from(ary.slice(ptr, ptr + length)).toString("utf8");
+  }
+  __log(ptr: number): void {
+    this.emit("log", this.getStringFromPtr(ptr));
   }
   __load_input(ptr: number): void {
     const view = new Uint8Array(this.memory.buffer);
@@ -151,11 +151,8 @@ export class IndexerProgram extends EventEmitter {
     if (!this.kv[key]) return 0;
     return stripHexPrefix(this.kv[key]).length / 2;
   }
-  abort(ptr: number) {
-    const ary = Array.from(new Uint8Array(this.memory.buffer));
-    const data = Buffer.from(ary);
-    const length = data.readUInt32LE(ptr - 4);
-    const msg = Buffer.from(ary.slice(ptr, ptr + length)).toString("utf8");
+  abort(msgPtr: number) {
+    const msg = this.getStringFromPtr(msgPtr);
     this.emit(`abort: ${msg}`);
     throw Error(`abort: ${msg}`);
   }

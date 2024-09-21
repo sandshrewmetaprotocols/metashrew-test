@@ -24,13 +24,14 @@ export declare class IndexerProgram extends EventEmitter {
     blockHeight: number;
     constructor(program: ArrayBuffer);
     get memory(): any;
+    getStringFromPtr(ptr: number): string;
     __log(ptr: number): void;
     __load_input(ptr: number): void;
     __host_len(): number;
     __flush(v: number): void;
     __get(k: number, v: number): void;
     __get_len(k: number): number;
-    abort(ptr: number, ...args: any[]): void;
+    abort(msgPtr: number): void;
     setBlock(block: string): IndexerProgram;
     setBlockHeight(blockHeight: number): IndexerProgram;
     run(symbol: string): Promise<any>;
